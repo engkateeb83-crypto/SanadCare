@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signed() { return request.auth != null; }
+    function own(uid) { return signed() && request.auth.uid == uid; }
+    function roleIs(role) {
+      return signed() && get(/databases/$(database)/documents/accounts/$(request.auth.uid)).data.role == role;
+    }
+    function linked(familyUid) {
+      let link = get(/databases/$(database)/documents/links/$(familyUid));
+      return signed() && link.data.status == 'accepted'
+        && (request.auth.uid == familyUid || request.auth.uid == link.data.doctorUid);
+    }
+    match /accounts/{uid} {
+      allow get: if own(uid);
+      allow create: if own(uid) && request.resource.data.keys().hasOnly(['role'])
+        && request.resource.data.role in ['FAMILY','DOCTOR']
+        && (!exists(/databases/$(database)/documents/doctors/$(uid)) || request.resource.data.role == 'DOCTOR')
+        && (!exists(/databases/$(database)/documents/links/$(uid)) || exists(/databases/$(database)/documents/doctors/$(uid)) || request.resource.data.role == 'FAMILY');
+    }
+    match /doctors/{uid} {
+      allow get: if own(uid);
+      allow create: if own(uid) && roleIs('DOCTOR')
+        && request.resource.data.keys().hasOnly(['code', 'name'])
+        && request.resource.data.code is string && request.resource.data.code.size() == 8
+        && request.resource.data.name is string && request.resource.data.name.size() > 1 && request.resource.data.name.size() <= 150
+        && getAfter(/databases/$(database)/documents/doctorCodes/$(request.resource.data.code)).data.uid == uid
+        && getAfter(/databases/$(database)/documents/doctorCodes/$(request.resource.data.code)).data.name == request.resource.data.name;
+    }
+    match /doctorCodes/{code} {
+      allow get: if signed();
+      allow create: if signed() && code.size() == 8
+        && request.resource.data.keys().hasOnly(['uid', 'name'])
+        && request.resource.data.uid == request.auth.uid
+        && getAfter(/databases/$(database)/documents/doctors/$(request.auth.uid)).data.code == code
+        && getAfter(/databases/$(database)/documents/doctors/$(request.auth.uid)).data.name == request.resource.data.name;
+    }
+    match /links/{familyUid} {
+      allow get: if own(familyUid) || (signed() && resource.data.doctorUid == request.auth.uid);
+      allow list: if signed() && resource.data.doctorUid == request.auth.uid;
+      allow create: if own(familyUid) && roleIs('FAMILY')
+        && request.resource.data.keys().hasOnly(['familyUid','doctorUid','code','familyName','status'])
+        && request.resource.data.familyUid == familyUid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.familyName is string && request.resource.data.familyName.size() > 0 && request.resource.data.familyName.size() <= 150
+        && request.resource.data.doctorUid != familyUid
+        && get(/databases/$(database)/documents/doctorCodes/$(request.resource.data.code)).data.uid == request.resource.data.doctorUid;
+      allow update: if signed() && resource.data.doctorUid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['accepted','rejected'];
+      allow delete: if own(familyUid);
+      match /messages/{messageId} {
+        allow get, list: if linked(familyUid)
+          && resource.data.doctorUid == get(/databases/$(database)/documents/links/$(familyUid)).data.doctorUid;
+        allow create: if linked(familyUid)
+          && request.resource.data.keys().hasOnly(['doctorUid','sender','body','at'])
+          && request.resource.data.doctorUid == get(/databases/$(database)/documents/links/$(familyUid)).data.doctorUid
+          && request.resource.data.sender == request.auth.uid
+          && request.resource.data.body is string
+          && request.resource.data.body.size() > 0 && request.resource.data.body.size() <= 2000
+          && request.resource.data.at == request.time;
+      }
+    }
+    match /records/{familyUid} {
+      allow get: if own(familyUid) || (signed()
+        && get(/databases/$(database)/documents/links/$(familyUid)).data.doctorUid == request.auth.uid
+        && get(/databases/$(database)/documents/links/$(familyUid)).data.status == 'accepted');
+      allow create, update: if own(familyUid)
+        && request.resource.data.keys().hasOnly(['payload','updatedAt'])
+        && request.resource.data.payload is string && request.resource.data.payload.size() <= 700000
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if own(familyUid);
+    }
+  }
+}

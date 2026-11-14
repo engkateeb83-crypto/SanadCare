@@ -1,0 +1,192 @@
+[
+  {
+    "test": "Create synthetic family",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Create synthetic doctor",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Create synthetic outsider",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Save immutable family role",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Save immutable doctor role",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Read saved family role on login",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Family cannot switch to doctor",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Doctor cannot switch to family",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Family cannot register doctor directory",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Register doctor atomic directory",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Family lookup doctor",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Family creates pending request",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Pending doctor cannot message",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Family publishes manual readings",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Family reads own record",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Pending doctor blocked",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Family cannot self accept",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Unrelated account cannot accept",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Doctor accepts",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Doctor sends message",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Family receives doctor message",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Family replies",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Doctor receives family reply",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Unrelated account cannot read chat",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Unrelated account cannot message",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Sender impersonation blocked",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Family conversation query",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Doctor conversation query",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Accepted doctor reads",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Unrelated account cannot read",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Doctor cannot overwrite medical record",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Family updates reading",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Doctor receives latest data",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Doctor authorized request query",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Family revokes link",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "Revoked doctor blocked by server",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Revoked doctor cannot read messages",
+    "status": 403,
+    "passed": true
+  },
+  {
+    "test": "Revoked doctor cannot send messages",
+    "status": 403,
+    "passed": true
+  }
+]

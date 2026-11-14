@@ -1,0 +1,14 @@
+.gradle/
+**/build/
+local.properties
+.idea/
+*.iml
+*.jks
+*.keystore
+*.hprof
+.externalNativeBuild/
+.cxx/
+.env
+.env.*
+*service-account*.json
+*firebase-adminsdk*.json
